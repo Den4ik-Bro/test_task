@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1 style="text-align:center;">Результат</h1>
+    <a href="{% url 'main:get_vacancy' %}">назад к поиску вакансий</a>
+    <form action="." method="GET">
+        {{form.as_p}}
+        <input type="submit" value="поиск по выборке">
+    </form>
+    <table align="center" border="1px">
+        <tr>
+            <td>Название</td>
+            <td>Город</td>
+            <td>Дата публикации</td>
+            <td>Зарплата от</td>
+            <td>Зарплата до</td>
+            <td>Валюта</td>
+            <td>Ссылка</td>
+        </tr>
+        {% for res in result %}
+        <tr>
+            <th>{{res.vacancy_name}}</th>
+            <th>{{res.city}}</th>
+            <th>{{res.date_published|date:"d/m/Y H:i"}}</th>
+            <th>{{res.min_salary}}</th>
+            <th>{{res.max_salary}}</th>
+            <th>{{res.currency}}</th>
+            <th><a href="{{res.url}}">{{res.url}}</a></th>
+        </tr>
+        {% endfor %}
+    </table>
+    {% if text %}
+        {% if page_obj.has_other_pages %}
+            <div style="text-align:center">
+                <a href="?text={{text}}&page=1">первая страница</a>
+                {% for p in paginator.page_range %}
+                    {% if  p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+                        <a href="?text={{text}}&page={{p}}">{{p}}</a>
+                    {% endif %}
+                {% endfor %}
+                <a href="?text={{text}}&page={{ page_obj.paginator.num_pages }}">последняя страница</a>
+            </div>
+        {% endif %}
+    {% else %}
+        {% if page_obj.has_other_pages %}
+            <div style="text-align:center">
+                <a href="?page=1">первая страница</a>
+                {% for p in paginator.page_range %}
+                    {% if  p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+                        <a href="?page={{p}}">{{p}}</a>
+                    {% endif %}
+                {% endfor %}
+                <a href="?page={{ page_obj.paginator.num_pages }}">последняя страница</a>
+            </div>
+        {% endif %}
+    {% endif %}
+    <br>
+    <form action="{% url 'main:delete' %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="удалить выборку">
+    </form>
+
+</body>
+</html>
